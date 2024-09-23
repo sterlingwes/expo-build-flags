@@ -15,6 +15,9 @@
     "@tsconfig/node18": "^18.2.4",
     "typescript": "^5"
   },
+  "peerDependencies": {
+    "typescript": "*"
+  },
   "scripts": {
     "build": "tsc"
   }

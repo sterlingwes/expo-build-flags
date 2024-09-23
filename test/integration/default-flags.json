@@ -1,5 +1,5 @@
 {
-  "mergePath": "app/buildFlags.json",
+  "mergePath": "app/buildFlags.ts",
   "flags": {
     "secretFeature": {
       "value": false,

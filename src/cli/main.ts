@@ -1,11 +1,7 @@
 import { resolve } from "path";
 import { readFile, writeFile } from "fs/promises";
-
-type FlagMap = Record<string, { value: boolean; meta: any }>;
-type FlagsConfig = {
-  mergePath: string;
-  flags: FlagMap;
-};
+import { FlagsConfig, FlagMap } from "./types";
+import { printAsTs } from "./ts-printer";
 
 const readConfig = async (): Promise<FlagsConfig> => {
   try {
@@ -77,8 +73,21 @@ class BuildFlags {
   }
 
   async save(path: string) {
-    const flags = JSON.stringify(this.flags, null, 2);
-    await writeFile(resolve(path), flags);
+    if (path.endsWith(".json")) {
+      const flags = JSON.stringify(this.flags, null, 2);
+      await writeFile(resolve(path), flags);
+      return;
+    }
+
+    if (path.endsWith(".ts")) {
+      const ts = printAsTs(this.flags);
+      await writeFile(resolve(path), ts);
+      return;
+    }
+
+    throw new Error(
+      "Invalid file extension in flags file for mergePath: expected .json or .ts"
+    );
   }
 }
 

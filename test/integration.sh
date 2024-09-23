@@ -2,6 +2,8 @@
 
 set -e
 
+npm run build
+
 echo "Creating expo app"
 rm -rf example
 CI=1 npx create-expo-app example
@@ -18,8 +20,8 @@ cp ../test/integration/default-flags.json ./flags.json
 echo "run CLI flag override"
 npx build-flags override +secretFeature -newFeature
 
-written=$(cat app/buildFlags.json)
-expected=$(cat ../test/integration/expected-merge.json)
+written=$(cat app/buildFlags.ts)
+expected=$(cat ../test/integration/expected-merge.ts)
 
 if [[ "$written" ==  "$expected" ]]; then
   echo "CLI flag override passed"
