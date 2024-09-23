@@ -4,6 +4,16 @@ A module to make feature-flagging easier for expo projects.
 
 _This module is in active development and is not stable or well documented yet._
 
+## Getting Started
+
+`yarn add expo-build-flags`
+
+Add a flags file to the root of your repo in the form of [the test example](test/integration/default-flags.json).
+
+Run `yarn build-flags override +secretFeature -newFeature` sometime before your bundle server or build start to generate the runtime typescript module. This path is defined by `mergePath` and you should add it to your project gitignore.
+
+The arguments after the override command are the flags you want to `+` enable or `-` disable. No comparison with the default value is done, so if it's already enabled and you `+enable` it, it's a no-op.
+
 ## Goals
 
 - allow defining a base set of flags that are available at runtime in one place
