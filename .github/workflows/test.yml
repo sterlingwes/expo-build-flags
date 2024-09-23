@@ -19,7 +19,7 @@ jobs:
           node-version: "18"
 
       - name: Install dependencies
-        run: yarn
+        run: npm install
 
       - name: Run integration spec
         run: ./test/integration.sh
