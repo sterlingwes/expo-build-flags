@@ -1,0 +1,23 @@
+{
+  "mergePath": "app/buildFlags.json",
+  "flags": {
+    "secretFeature": {
+      "value": false,
+      "meta": {
+        "team": "platform"
+      }
+    },
+    "publishedFeatured": {
+      "value": true,
+      "meta": {
+        "team": "growth"
+      }
+    },
+    "newFeature": {
+      "value": true,
+      "meta": {
+        "team": "growth"
+      }
+    }
+  }
+}

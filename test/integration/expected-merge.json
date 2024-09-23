@@ -1,0 +1,20 @@
+{
+  "secretFeature": {
+    "value": true,
+    "meta": {
+      "team": "platform"
+    }
+  },
+  "publishedFeatured": {
+    "value": true,
+    "meta": {
+      "team": "growth"
+    }
+  },
+  "newFeature": {
+    "value": false,
+    "meta": {
+      "team": "growth"
+    }
+  }
+}

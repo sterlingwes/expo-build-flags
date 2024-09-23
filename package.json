@@ -1,0 +1,19 @@
+{
+  "name": "expo-build-flags",
+  "version": "0.1.0",
+  "main": "index.js",
+  "repository": "https://github.com/sterlingwes/expo-build-flags",
+  "author": "Wes Johnson <wes@swj.io>",
+  "license": "MIT",
+  "files": [
+    "bin",
+    "build"
+  ],
+  "devDependencies": {
+    "@tsconfig/node18": "^18.2.4",
+    "typescript": "^5"
+  },
+  "scripts": {
+    "build": "tsc"
+  }
+}
