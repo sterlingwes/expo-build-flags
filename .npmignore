@@ -1,0 +1,7 @@
+.gitignore
+src/
+example/
+node_modules/
+test
+tsconfig.json
+*.tgz
