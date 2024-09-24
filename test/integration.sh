@@ -19,7 +19,7 @@ echo "run CLI flag override"
 ./node_modules/.bin/build-flags override +secretFeature -newFeature
 
 written=$(cat app/buildFlags.ts)
-expected=$(cat ../test/integration/expected-merge.ts)
+expected=$(cat ../test/integration/expected-cli-override.ts)
 
 if [[ "$written" ==  "$expected" ]]; then
   echo "CLI flag override passed"

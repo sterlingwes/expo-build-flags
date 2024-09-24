@@ -1,5 +1,5 @@
 export const BuildFlags = {
-    newFeature: true,
+    newFeature: false,
     publishedFeatured: true,
     secretFeature: true
 };
