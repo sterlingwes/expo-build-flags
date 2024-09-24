@@ -7,6 +7,7 @@
   "bin": {
     "build-flags": "bin/build-flags.sh"
   },
+  "main": "build/api/index.js",
   "files": [
     "bin",
     "build"

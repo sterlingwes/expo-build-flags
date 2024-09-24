@@ -25,5 +25,22 @@ if [[ "$written" ==  "$expected" ]]; then
   echo "CLI flag override passed"
 else
   echo "CLI flag override failed"
+  diff <(echo "$written") <(echo "$expected")
+  exit 1
+fi
+
+# test programmatic api
+echo "run programmatic flag override"
+cp ../test/integration/api-usage.mjs ./
+node api-usage.mjs
+
+written=$(cat app/buildFlags.ts)
+expected=$(cat ../test/integration/expected-api-override.ts)
+
+if [[ "$written" ==  "$expected" ]]; then
+  echo "API flag override passed"
+else
+  echo "API flag override failed"
+  diff <(echo "$written") <(echo "$expected")
   exit 1
 fi

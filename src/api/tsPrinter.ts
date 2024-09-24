@@ -17,7 +17,7 @@ export const printAsTs = (flags: FlagMap) => {
                 .map((key) =>
                   ts.factory.createPropertyAssignment(
                     key,
-                    flags[key]
+                    flags[key].value
                       ? ts.factory.createTrue()
                       : ts.factory.createFalse()
                   )
