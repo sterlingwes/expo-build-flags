@@ -1,3 +1,4 @@
+import YAML from "yaml";
 import { existsSync } from "fs";
 import { readFile, writeFile } from "fs/promises";
 import { BuildFlags } from "../api/BuildFlags";
@@ -29,6 +30,7 @@ const printHelp = (command?: string) => {
   }
   console.log(`Usage: build-flags [command] [flags]
   Commands:
+    init      Initialize flags.yml and buildFlags.ts for the project in the current directory
     override  Override default flags with provided flag arguments: +flag to enable, -flag to disable
   `);
 };
@@ -49,8 +51,8 @@ const initFlagsFile = async () => {
     },
   };
   console.log("");
-  await writeFile("flags.json", JSON.stringify(baseFlags, null, 2));
-  console.log("Wrote default flags to flags.json in the current directory");
+  await writeFile("flags.yml", YAML.stringify(baseFlags, null, 2));
+  console.log("Wrote default flags to flags.yml in the current directory");
   const flags = new BuildFlags(baseFlags.flags);
   await flags.save(baseFlags.mergePath);
   if (gitignoreExists) {

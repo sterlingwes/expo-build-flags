@@ -8,7 +8,7 @@ _This module is in active development and is not stable or well documented yet._
 
 `yarn add expo-build-flags`
 
-Add a flags file to the root of your repo in the form of [the test example](test/integration/default-flags.json).
+Add a flags file to the root of your repo in the form of [the test example](test/integration/default-flags.yml).
 
 Run `yarn build-flags override +secretFeature -newFeature` sometime before your bundle server or build start to generate the runtime typescript module. This path is defined by `mergePath` and you should add it to your project gitignore.
 

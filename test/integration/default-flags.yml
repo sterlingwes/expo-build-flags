@@ -1,0 +1,14 @@
+mergePath: "app/buildFlags.ts"
+flags:
+  secretFeature:
+    value: false
+    meta:
+      team: "platform"
+  publishedFeatured:
+    value: true
+    meta:
+      team: "growth"
+  newFeature:
+    value: true
+    meta:
+      team: "growth"

@@ -13,7 +13,7 @@ cd example
 npm install --install-links --save-dev ../
 
 echo "copy over flag fixture"
-cp ../test/integration/default-flags.json ./flags.json
+cp ../test/integration/default-flags.yml ./flags.yml
 
 echo "run CLI flag override"
 ./node_modules/.bin/build-flags override +secretFeature -newFeature
