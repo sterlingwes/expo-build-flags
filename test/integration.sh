@@ -44,3 +44,17 @@ else
   diff <(echo "$written") <(echo "$expected")
   exit 1
 fi
+
+#
+# test tree shaking
+#
+flagged_code='import { BuildFlags } from "../buildFlags";\n\n'
+flagged_code+='if (BuildFlags.newFeature) {\n'
+flagged_code+='  console.log("newFeature enabled");\n'
+flagged_code+='}\n\n'
+
+target_line='export default function HomeScreen() {'
+
+sed -i -e "s/$target_line/$flagged_code$target_line/g" 'app/(tabs)/index.tsx'
+
+npx expo export
