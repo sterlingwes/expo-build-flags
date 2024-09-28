@@ -10,14 +10,18 @@
   "main": "build/api/index.js",
   "files": [
     "bin",
-    "build"
+    "build",
+    "babel-plugin.js"
   ],
   "devDependencies": {
     "@tsconfig/node18": "^18.2.4",
+    "@types/babel__core": "^7.20.5",
+    "@types/babel__helper-plugin-utils": "^7.10.3",
     "@types/node": "^22.6.1",
     "typescript": "^5"
   },
   "dependencies": {
+    "@babel/helper-plugin-utils": "^7.24.8",
     "yaml": "^2.5.1"
   },
   "peerDependencies": {

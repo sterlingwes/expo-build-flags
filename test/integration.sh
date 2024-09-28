@@ -18,7 +18,7 @@ cp ../test/integration/default-flags.yml ./flags.yml
 echo "run CLI flag override"
 ./node_modules/.bin/build-flags override +secretFeature -newFeature
 
-written=$(cat app/buildFlags.ts)
+written=$(cat constants/buildFlags.ts)
 expected=$(cat ../test/integration/expected-cli-override.ts)
 
 if [[ "$written" ==  "$expected" ]]; then
@@ -34,7 +34,7 @@ echo "run programmatic flag override"
 cp ../test/integration/api-usage.mjs ./
 node api-usage.mjs
 
-written=$(cat app/buildFlags.ts)
+written=$(cat constants/buildFlags.ts)
 expected=$(cat ../test/integration/expected-api-override.ts)
 
 if [[ "$written" ==  "$expected" ]]; then

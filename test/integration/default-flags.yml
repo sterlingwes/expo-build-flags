@@ -1,4 +1,4 @@
-mergePath: "app/buildFlags.ts"
+mergePath: "constants/buildFlags.ts"
 flags:
   secretFeature:
     value: false
