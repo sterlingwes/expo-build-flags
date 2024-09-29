@@ -28,5 +28,6 @@ jobs:
         working-directory: example
         run: ./test/test-overrides.sh
 
-      # - name: Run spec for babel plugin tree shaking
-      #   run: ./test/test-babel-plugin.sh
+      - name: Run spec for babel plugin tree shaking
+        working-directory: example
+        run: ../test/test-babel-plugin.sh
