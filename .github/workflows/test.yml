@@ -30,4 +30,4 @@ jobs:
 
       - name: Run spec for babel plugin tree shaking
         working-directory: example
-        run: ../test/test-babel-plugin.sh
+        run: node ../test/test-babel-plugin.sh

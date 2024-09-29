@@ -29,6 +29,6 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "./test/setup.sh && ./test/test-overrides.sh"
+    "test": "./test/setup.sh && cd example && ../test/test-overrides.sh && node ../test/test-babel-plugin.js"
   }
 }
