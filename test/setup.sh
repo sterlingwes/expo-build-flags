@@ -13,4 +13,4 @@ cd example
 npm install --install-links --save-dev ../
 
 echo "copy over flag fixture"
-cp ../test/integration/default-flags.yml ./flags.yml
+cp ../test/overrides/default-flags.yml ./flags.yml
