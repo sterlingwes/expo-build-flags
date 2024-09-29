@@ -25,6 +25,7 @@ jobs:
         run: ./test/setup.sh
 
       - name: Run spec for flag overrides
+        working-directory: example
         run: ./test/test-overrides.sh
 
       # - name: Run spec for babel plugin tree shaking

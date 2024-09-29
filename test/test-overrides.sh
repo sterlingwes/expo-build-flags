@@ -9,7 +9,6 @@ set -e
 echo "run CLI flag override"
 ./node_modules/.bin/build-flags override +secretFeature -newFeature
 
-
 written=$(cat constants/buildFlags.ts)
 expected=$(cat ../test/overrides/expected-cli-override.ts)
 
@@ -28,7 +27,6 @@ fi
 echo "run programmatic flag override"
 cp ../test/overrides/api-usage.mjs ./
 node api-usage.mjs
-
 
 written=$(cat constants/buildFlags.ts)
 expected=$(cat ../test/overrides/expected-api-override.ts)
