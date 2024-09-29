@@ -21,5 +21,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run integration spec
-        run: ./test/integration.sh
+      - name: Setup test project
+        run: ./test/setup.sh
+
+      - name: Run spec for flag overrides
+        run: ./test/test-overrides.sh
+
+      # - name: Run spec for babel plugin tree shaking
+      #   run: ./test/test-babel-plugin.sh

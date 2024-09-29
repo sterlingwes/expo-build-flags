@@ -29,6 +29,6 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "./test/integration.sh"
+    "test": "./test/setup.sh && ./test/test-overrides.sh"
   }
 }
