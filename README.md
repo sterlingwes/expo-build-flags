@@ -31,6 +31,7 @@ The `flagsModule` path must match the runtime `mergePath` in your committed flag
 
 - allow defining a base set of flags that are available at runtime in one place
 - allow for overriding a flag's value locally during development (without having to change the default value committed to source control)
+- allow for running OTA updates with the flag on for specific CI branches
 - allow for overriding a flag's value for any native build for one-off testing
 - allow for referencing flag values in JS
 - allow for referencing flag values from native code on iOS or Android
