@@ -14,7 +14,29 @@ Run `yarn build-flags override +secretFeature -newFeature` sometime before your 
 
 The arguments after the override command are the flags you want to `+` enable or `-` disable. No comparison with the default value is done, so if it's already enabled and you `+enable` it, it's a no-op.
 
-To benefit from tree-shaking, add the babel plugin to your project's babel config:
+### Set Flags in CI & for Static Builds
+
+To set flags for EAS builds, set the `EXPO_BUILD_FLAGS` environment variable in `eas.json` for your profile. This value will be available to the config plugin at build time in EAS when you add it to your `app.json` plugins array:
+
+```diff
+{
+  "expo": {
++    "plugins": ["expo-build-flags"]
+  }
+}
+```
+
+Using the `EXPO_BUILD_FLAGS` environment variable, the config plugin will:
+
+- add a `<meta-data android:name="EXBuildFlags" />` tag to your AndroidManifest.xml
+- add a `EXBuildFlags` array to your Info.plist
+- generate the runtime build flags module for your javascript bundle
+
+The variable value is a comma-separated list of flag names you want to enable, ie: `EXPO_BUILD_FLAGS=newFeature,secretFeature`.
+
+### Enable Tree Shaking
+
+To benefit from tree shaking, add the babel plugin to your project's babel config:
 
 ```diff
 {
@@ -25,7 +47,7 @@ To benefit from tree-shaking, add the babel plugin to your project's babel confi
 }
 ```
 
-The `flagsModule` path must match the runtime `mergePath` in your committed flags.yml file.
+The `flagsModule` path must match the runtime `mergePath` in your committed flags.yml file. This plugin replaces the `BuildFlags` imports with the literal boolean values which allows the build pipeline to strip unreachable paths.
 
 ## Goals
 
