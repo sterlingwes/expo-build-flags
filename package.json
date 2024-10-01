@@ -11,6 +11,7 @@
   "files": [
     "bin",
     "build",
+    "app.plugin.js",
     "babel-plugin.js"
   ],
   "devDependencies": {
@@ -30,6 +31,6 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "./test/setup.sh && cd example && ../test/test-overrides.sh && node ../test/test-babel-plugin.js"
+    "test": "./test/setup.sh && cd example && ../test/test-overrides.sh && node ../test/test-babel-plugin.js && node ../test/test-config-plugin.js"
   }
 }

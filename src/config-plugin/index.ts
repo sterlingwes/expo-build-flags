@@ -1,10 +1,12 @@
 import {
   ConfigPlugin,
+  createRunOncePlugin,
   withAndroidManifest,
   withDangerousMod,
   withInfoPlist,
 } from "@expo/config-plugins";
 import { generateOverrides } from "../api";
+import pkg from "../../package.json";
 
 const withAndroidBuildFlags: ConfigPlugin<{ flags: string[] }> = (
   config,
@@ -71,22 +73,23 @@ const parseEnvFlags = () => {
   return Array.from(flags);
 };
 
-const withBuildFlags: ConfigPlugin<{ skipBundleOverride: boolean }> = (
-  config,
-  props
-) => {
+const withBuildFlags: ConfigPlugin<
+  { skipBundleOverride: boolean } | undefined
+> = (config, props) => {
   const flags = parseEnvFlags();
   if (!flags.length) {
-    return config;
+    return props?.skipBundleOverride
+      ? config
+      : withBundleFlags(config, { flags });
   }
 
   const nativeConfig = withAndroidBuildFlags(config, { flags });
   const mergedNativeConfig = withAppleBuildFlags(nativeConfig, { flags });
-  if (props.skipBundleOverride) {
+  if (props?.skipBundleOverride) {
     return mergedNativeConfig;
   }
 
   return withBundleFlags(mergedNativeConfig, { flags });
 };
 
-export default withBuildFlags;
+export default createRunOncePlugin(withBuildFlags, pkg.name, pkg.version);

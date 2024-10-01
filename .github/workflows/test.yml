@@ -31,3 +31,7 @@ jobs:
       - name: Run spec for babel plugin tree shaking
         working-directory: example
         run: node ../test/test-babel-plugin.js
+
+      - name: Run spec for expo config plugin
+        working-directory: example
+        run: node ../test/test-config-plugin.js
