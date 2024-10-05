@@ -30,8 +30,9 @@ const printHelp = (command?: string) => {
   }
   console.log(`Usage: build-flags [command] [flags]
   Commands:
-    init      Initialize flags.yml and buildFlags.ts for the project in the current directory
-    override  Override default flags with provided flag arguments: +flag to enable, -flag to disable
+    init          Initialize flags.yml and buildFlags.ts for the project in the current directory
+    override      Override default flags with provided flag arguments: +flag to enable, -flag to disable
+    ota-override  Override default flags like "override" but also consider branch matching rules
   `);
 };
 
@@ -79,6 +80,15 @@ const run = async () => {
 
   if (command === "override") {
     await generateOverrides({ flagsToEnable, flagsToDisable });
+    return;
+  }
+
+  if (command === "ota-override") {
+    await generateOverrides({
+      flagsToEnable,
+      flagsToDisable,
+      enableBranchFlags: true,
+    });
     return;
   }
 

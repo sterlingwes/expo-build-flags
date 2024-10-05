@@ -2,12 +2,38 @@ import { writeFile } from "fs/promises";
 import { FlagMap } from "./types";
 import { resolve } from "path";
 import { printAsTs } from "./tsPrinter";
+import { getCIBranch } from "./ciHelpers";
+import { hasMatch } from "./globUtil";
 
 export class BuildFlags {
   flags: FlagMap;
 
   constructor(defaultFlags: FlagMap) {
     this.flags = defaultFlags;
+  }
+
+  enableBranchFlags() {
+    const branch = getCIBranch();
+    if (!branch) {
+      return;
+    }
+
+    const branchFlags = Object.keys(this.flags).filter((flag) => {
+      const ota = this.flags[flag].ota;
+      if (
+        ota &&
+        Array.isArray(ota.branches) &&
+        hasMatch(branch, ota.branches)
+      ) {
+        return true;
+      }
+    });
+
+    if (branchFlags.length === 0) {
+      return;
+    }
+
+    this.enable(new Set(branchFlags));
   }
 
   enable(enables: Set<string>) {
