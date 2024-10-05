@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Run jest suites
+        run: ./node_modules/.bin/jest
+
       - name: Setup test project
         run: ./test/setup.sh
 

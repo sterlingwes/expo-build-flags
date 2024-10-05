@@ -35,6 +35,6 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "./test/setup.sh && cd example && ../test/test-overrides.sh && node ../test/test-babel-plugin.js && node ../test/test-config-plugin.js"
+    "test": "./node_modules/.bin/jest && ./test/setup.sh && cd example && ../test/test-overrides.sh && node ../test/test-babel-plugin.js && node ../test/test-config-plugin.js"
   }
 }
