@@ -61,14 +61,14 @@ Example for flags.yml definition:
 flags:
   featureWithNativeStuff:
     value: false
-    nativeModules:
+    modules:
       - react-native-device-info
 ```
 
 In the above example, `react-native-device-info` would be excluded from autolinking. If you want to allow builds to occur on a specific branch, you can specify it:
 
 ```yaml
-nativeModules:
+modules:
   - react-native-device-info:
       branch: some-branch-with-build
 ```

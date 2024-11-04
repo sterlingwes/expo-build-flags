@@ -53,10 +53,10 @@ export const readConfigModuleExclusions = async (
   return Object.keys(flags)
     .filter((flag) => !flags[flag].value)
     .reduce((acc, flag) => {
-      if (flags[flag].nativeModules && !flagOverrides?.includes(flag)) {
+      if (flags[flag].modules && !flagOverrides?.includes(flag)) {
         return [
           ...acc,
-          ...flags[flag].nativeModules
+          ...flags[flag].modules
             .map((mod) => {
               if (typeof mod === "string") {
                 return mod;

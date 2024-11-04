@@ -4,7 +4,7 @@ flags:
     value: false
     meta:
       team: "platform"
-    nativeModules:
+    modules:
       - react-native-device-info
       - do-not-exclude-me:
           branch: feature-in-dev-build-branch
@@ -14,5 +14,5 @@ flags:
     value: true
     meta:
       team: "growth"
-    nativeModules:
+    modules:
       - "react-native-mmkv"
