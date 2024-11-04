@@ -34,3 +34,25 @@ export const readConfig = async (): Promise<FlagsConfig> => {
     process.exit(1);
   }
 };
+
+export const readConfigModuleExclusions = async (): Promise<string[]> => {
+  const { flags } = await readConfig();
+  return Object.keys(flags)
+    .filter((flag) => !flags[flag].value)
+    .reduce((acc, flag) => {
+      if (flags[flag].nativeModules) {
+        return [
+          ...acc,
+          ...flags[flag].nativeModules
+            .map((mod) => {
+              if (typeof mod === "string") {
+                return mod;
+              }
+              return mod.branch;
+            })
+            .filter((mod) => !!mod),
+        ];
+      }
+      return acc;
+    }, [] as string[]);
+};

@@ -62,7 +62,8 @@ flags:
   featureWithNativeStuff:
     value: false
     nativeModules:
-      - react-native-device-info
+      - react-native-device-info:
+          branch: some-branch-with-build
       - ./modules/my-local-module # needs expo PR https://github.com/expo/expo/blob/24d5ae5f288013df19ac09a3406c6a507d781ddb/packages/expo-modules-autolinking/src/autolinking/findModules.ts#L52
 ```
 
