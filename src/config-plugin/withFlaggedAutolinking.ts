@@ -22,7 +22,7 @@ const withFlaggedAutolinkingForApple: ConfigPlugin = (config) => {
 
 const withFlaggedAutolinkingForAndroid: ConfigPlugin = (config) => {
   return withDangerousMod(config, [
-    "ios",
+    "android",
     async (config) => {
       const gradleSettings = path.join(
         config.modRequest.platformProjectRoot,
@@ -45,7 +45,7 @@ export const withFlaggedAutolinking: ConfigPlugin = (config) => {
 
 export function updatePodfileAutolinkCall(
   contents: string,
-  { exclude }: { exclude: string }
+  { exclude }: { exclude: string[] }
 ): string {
   const match = contents.match(/use_expo_modules!(\s*\(([^)]+)\))?/);
   if (!match?.[0]) {
@@ -60,13 +60,13 @@ export function updatePodfileAutolinkCall(
 
   return contents.replace(
     match[0],
-    `use_expo_modules!({ exclude: ["${exclude}"] })`
+    `use_expo_modules!({ exclude: ["${exclude.join('","')}"] })`
   );
 }
 
 export function updateGradleAutolinkCall(
   contents: string,
-  { exclude }: { exclude: string }
+  { exclude }: { exclude: string[] }
 ): string {
   const match = contents.match(/useExpoModules\(\)/);
   if (!match?.[0]) {
@@ -79,21 +79,17 @@ export function updateGradleAutolinkCall(
     );
   }
 
-  const useExpoWithExclusions = `
-useExpoModules {
-  exclude = '${exclude}'
-}  
-`;
-
-  return contents.replace(match[0], useExpoWithExclusions);
+  return contents.replace(
+    match[0],
+    `useExpoModules(exclude: ["${exclude.join('","')}"])`
+  );
 }
 
-let exclusionsString: string | null = null;
+let exclude: string[] | null = null;
 async function getExclusions() {
-  if (typeof exclusionsString === "string") {
-    return exclusionsString;
+  if (Array.isArray(exclude)) {
+    return exclude;
   }
-  const exclusions = await readConfigModuleExclusions();
-  exclusionsString = exclusions.join(",");
-  return exclusionsString;
+  exclude = await readConfigModuleExclusions();
+  return exclude;
 }

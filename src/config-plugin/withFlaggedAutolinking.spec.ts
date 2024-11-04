@@ -14,7 +14,7 @@ describe("withFlaggedAutolinking", () => {
 
     it("should replace use_expo_modules! with exclude options in call", () => {
       const updatedContents = updatePodfileAutolinkCall(podfileContents, {
-        exclude: "react-native-device-info",
+        exclude: ["react-native-device-info"],
       });
       const updatedLine = updatedContents
         .split("\n")
@@ -38,19 +38,15 @@ describe("withFlaggedAutolinking", () => {
 
     it("should replace useExpoModules() with exclude options in call", () => {
       const updatedContents = updateGradleAutolinkCall(gradleSettingsContents, {
-        exclude: "react-native-device-info",
+        exclude: ["react-native-device-info", "some-other-module"],
       });
       const lines = updatedContents.split("\n");
-      const updatedLine = lines.findIndex((line) =>
+      const updatedLine = lines.find((line) =>
         line.trim().startsWith("useExpoModules")
       );
 
-      const matchLines = [lines[updatedLine]];
-      matchLines.push(lines[updatedLine + 1]);
-      matchLines.push(lines[updatedLine + 2]);
-
-      expect(matchLines.join("\n").trim()).toBe(
-        "useExpoModules {\n  exclude = 'react-native-device-info'\n}"
+      expect(updatedLine).toBe(
+        `useExpoModules(exclude: ["react-native-device-info","some-other-module"])`
       );
     });
   });
