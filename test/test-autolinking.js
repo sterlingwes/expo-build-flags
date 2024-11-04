@@ -1,10 +1,14 @@
 const fs = require("fs");
+const path = require("path");
 const cp = require("child_process");
+const {
+  disablePodfilePrepareHook,
+  mockXcodebuild,
+} = require("expo-native-lockfiles/cli/build/patcher");
 
 installExpoConfigPlugin();
 addModulesForExclusion();
-runPrebuild();
-assertPodfileLockExcludesModules();
+runAsync();
 
 /**
  * this install step assumes test-config-plugin runs before this spec suite
@@ -32,13 +36,26 @@ function addModulesForExclusion() {
   fs.writeFileSync("flags.yml", defaultFlags);
 }
 
-function runPrebuild() {
+async function runAsync() {
+  await runPrebuild();
+  await assertPodfileLockExcludesModules();
+  process.exit(0);
+}
+
+async function runPrebuild() {
   cp.execSync("./node_modules/.bin/expo prebuild --no-install --clean", {
     env: {
       ...process.env,
       CI: 1,
     },
   });
+
+  // before we can run pod-lockfile on a podfile for an RN app
+  // we need to mock out mac-specific calls for our linux CI environment
+  const podfilePath = path.resolve("./ios", "Podfile");
+  await mockXcodebuild({ debug: true, xcVersion: "15.4" });
+  await disablePodfilePrepareHook({ debug: true, podfilePath });
+
   cp.execSync("../node_modules/.bin/pod-lockfile --debug --project ios", {
     stdio: "inherit",
   });
