@@ -39,13 +39,9 @@ function runPrebuild() {
       CI: 1,
     },
   });
-  try {
-    cp.execSync("../node_modules/.bin/pod-lockfile --project ios", {
-      stdio: "inherit",
-    });
-  } catch (e) {
-    console.error("pod-lockfile threw");
-  }
+  cp.execSync("../node_modules/.bin/pod-lockfile --debug --project ios", {
+    stdio: "inherit",
+  });
 }
 
 function assertPodfileLockExcludesModules() {
