@@ -62,15 +62,18 @@ flags:
   featureWithNativeStuff:
     value: false
     nativeModules:
-      - react-native-device-info:
-          branch: some-branch-with-build
-      - ./modules/my-local-module # needs expo PR https://github.com/expo/expo/blob/24d5ae5f288013df19ac09a3406c6a507d781ddb/packages/expo-modules-autolinking/src/autolinking/findModules.ts#L52
+      - react-native-device-info
 ```
 
-Implementation:
+In the above example, `react-native-device-info` would be excluded from autolinking. If you want to allow builds to occur on a specific branch, you can specify it:
 
-- our config plugin can take props that enable this behaviour during prebuild
-- you wrap your metro config if you want to get runtime guidance about using unavailable imports for flagged features
+```yaml
+nativeModules:
+  - react-native-device-info:
+      branch: some-branch-with-build
+```
+
+Locally-referenced modules aren't currently supported (until [this 'exclude' exclusion](https://github.com/expo/expo/blob/24d5ae5f288013df19ac09a3406c6a507d781ddb/packages/expo-modules-autolinking/src/autolinking/findModules.ts#L52) can be overridden).
 
 ## Goals
 
