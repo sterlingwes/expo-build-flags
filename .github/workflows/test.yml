@@ -38,3 +38,7 @@ jobs:
       - name: Run spec for expo config plugin
         working-directory: example
         run: node ../test/test-config-plugin.js
+
+      - name: Run spec for flagged autolinking
+        working-directory: example
+        run: node ../test/test-autolinking.js
