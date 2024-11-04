@@ -1,11 +1,15 @@
 mergePath: "constants/buildFlags.ts"
 flags:
-  featureInDevelqopment:
+  featureInDevelopment:
     value: false
     meta:
       team: "platform"
     nativeModules:
-      - "react-native-device-info"
+      - react-native-device-info
+      - do-not-exclude-me:
+          branch: feature-in-dev-build-branch
+      - exclude-me:
+          branch: not-my-branch
   publishedFeature:
     value: true
     meta:

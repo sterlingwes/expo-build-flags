@@ -35,12 +35,25 @@ export const readConfig = async (): Promise<FlagsConfig> => {
   }
 };
 
-export const readConfigModuleExclusions = async (): Promise<string[]> => {
+const getGitBranchName = async () => {
+  try {
+    const head = await readFile(".git/HEAD", { encoding: "utf-8" });
+    const [, , branch] = head.trim().split("/");
+    return branch;
+  } catch (_) {
+    // no-op
+  }
+};
+
+export const readConfigModuleExclusions = async (
+  flagOverrides?: string[]
+): Promise<string[]> => {
   const { flags } = await readConfig();
+  const branch = await getGitBranchName();
   return Object.keys(flags)
     .filter((flag) => !flags[flag].value)
     .reduce((acc, flag) => {
-      if (flags[flag].nativeModules) {
+      if (flags[flag].nativeModules && !flagOverrides?.includes(flag)) {
         return [
           ...acc,
           ...flags[flag].nativeModules
@@ -48,9 +61,17 @@ export const readConfigModuleExclusions = async (): Promise<string[]> => {
               if (typeof mod === "string") {
                 return mod;
               }
-              return mod.branch;
+              const [[modName, modConfig]] = Object.entries(mod);
+              if (
+                typeof modConfig === "object" &&
+                "branch" in modConfig &&
+                // @ts-expect-error ts inference issue
+                modConfig.branch !== branch
+              ) {
+                return modName;
+              }
             })
-            .filter((mod) => !!mod),
+            .filter((mod): mod is string => typeof mod === "string"),
         ];
       }
       return acc;

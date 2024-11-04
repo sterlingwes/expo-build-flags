@@ -78,8 +78,10 @@ type ConfigPluginProps =
   | { skipBundleOverride?: boolean; flaggedAutolinking?: boolean }
   | undefined;
 
-const withBuildFlags: ConfigPlugin<ConfigPluginProps> = (config, props) => {
-  const flags = parseEnvFlags();
+type WithBuildFlagsProps = { skipBundleOverride?: boolean; flags: string[] };
+
+const withBuildFlags: ConfigPlugin<WithBuildFlagsProps> = (config, props) => {
+  const flags = props.flags;
   if (!flags.length) {
     return props?.skipBundleOverride
       ? config
@@ -100,12 +102,13 @@ const withBuildFlagsAndLinking: ConfigPlugin<ConfigPluginProps> = (
   props
 ) => {
   let mergedConfig = config;
+  const flags = parseEnvFlags();
 
   if (props?.flaggedAutolinking) {
-    mergedConfig = withFlaggedAutolinking(mergedConfig);
+    mergedConfig = withFlaggedAutolinking(mergedConfig, { flags });
   }
 
-  return withBuildFlags(config, props);
+  return withBuildFlags(config, { ...props, flags });
 };
 
 export default createRunOncePlugin(

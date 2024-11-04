@@ -3,7 +3,12 @@ import path from "path";
 import { ConfigPlugin, withDangerousMod } from "@expo/config-plugins";
 import { readConfigModuleExclusions } from "../api/readConfig";
 
-const withFlaggedAutolinkingForApple: ConfigPlugin = (config) => {
+type Props = { flags: string[] };
+
+const withFlaggedAutolinkingForApple: ConfigPlugin<Props> = (
+  config,
+  { flags }
+) => {
   return withDangerousMod(config, [
     "ios",
     async (config) => {
@@ -12,7 +17,7 @@ const withFlaggedAutolinkingForApple: ConfigPlugin = (config) => {
         "Podfile"
       );
       let contents = await fs.promises.readFile(podfile, "utf8");
-      const exclude = await getExclusions();
+      const exclude = await getExclusions(flags);
       contents = updatePodfileAutolinkCall(contents, { exclude });
       await fs.promises.writeFile(podfile, contents, "utf8");
       return config;
@@ -20,7 +25,10 @@ const withFlaggedAutolinkingForApple: ConfigPlugin = (config) => {
   ]);
 };
 
-const withFlaggedAutolinkingForAndroid: ConfigPlugin = (config) => {
+const withFlaggedAutolinkingForAndroid: ConfigPlugin<Props> = (
+  config,
+  { flags }
+) => {
   return withDangerousMod(config, [
     "android",
     async (config) => {
@@ -29,7 +37,7 @@ const withFlaggedAutolinkingForAndroid: ConfigPlugin = (config) => {
         "settings.gradle"
       );
       let contents = await fs.promises.readFile(gradleSettings, "utf8");
-      const exclude = await getExclusions();
+      const exclude = await getExclusions(flags);
       contents = updateGradleAutolinkCall(contents, { exclude });
       await fs.promises.writeFile(gradleSettings, contents, "utf8");
       return config;
@@ -37,9 +45,13 @@ const withFlaggedAutolinkingForAndroid: ConfigPlugin = (config) => {
   ]);
 };
 
-export const withFlaggedAutolinking: ConfigPlugin = (config) => {
+export const withFlaggedAutolinking: ConfigPlugin<{ flags: string[] }> = (
+  config,
+  props
+) => {
   return withFlaggedAutolinkingForAndroid(
-    withFlaggedAutolinkingForApple(config)
+    withFlaggedAutolinkingForApple(config, props),
+    props
   );
 };
 
@@ -86,10 +98,10 @@ export function updateGradleAutolinkCall(
 }
 
 let exclude: string[] | null = null;
-async function getExclusions() {
+async function getExclusions(flagOverrides?: string[]) {
   if (Array.isArray(exclude)) {
     return exclude;
   }
-  exclude = await readConfigModuleExclusions();
+  exclude = await readConfigModuleExclusions(flagOverrides);
   return exclude;
 }
