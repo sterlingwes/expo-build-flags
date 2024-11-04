@@ -1,0 +1,18 @@
+mergePath: "constants/buildFlags.ts"
+flags:
+  featureInDevelopment:
+    value: false
+    meta:
+      team: "platform"
+    modules:
+      - react-native-device-info
+      - do-not-exclude-me:
+          branch: feature-in-dev-build-branch
+      - exclude-me:
+          branch: not-my-branch
+  publishedFeature:
+    value: true
+    meta:
+      team: "growth"
+    modules:
+      - "react-native-mmkv"

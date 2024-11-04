@@ -7,6 +7,7 @@ import {
 } from "@expo/config-plugins";
 import { generateOverrides } from "../api";
 import pkg from "../../package.json";
+import { withFlaggedAutolinking } from "./withFlaggedAutolinking";
 
 const withAndroidBuildFlags: ConfigPlugin<{ flags: string[] }> = (
   config,
@@ -73,10 +74,14 @@ const parseEnvFlags = () => {
   return Array.from(flags);
 };
 
-const withBuildFlags: ConfigPlugin<
-  { skipBundleOverride: boolean } | undefined
-> = (config, props) => {
-  const flags = parseEnvFlags();
+type ConfigPluginProps =
+  | { skipBundleOverride?: boolean; flaggedAutolinking?: boolean }
+  | undefined;
+
+type WithBuildFlagsProps = { skipBundleOverride?: boolean; flags: string[] };
+
+const withBuildFlags: ConfigPlugin<WithBuildFlagsProps> = (config, props) => {
+  const flags = props.flags;
   if (!flags.length) {
     return props?.skipBundleOverride
       ? config
@@ -92,4 +97,22 @@ const withBuildFlags: ConfigPlugin<
   return withBundleFlags(mergedNativeConfig, { flags });
 };
 
-export default createRunOncePlugin(withBuildFlags, pkg.name, pkg.version);
+const withBuildFlagsAndLinking: ConfigPlugin<ConfigPluginProps> = (
+  config,
+  props
+) => {
+  let mergedConfig = config;
+  const flags = parseEnvFlags();
+
+  if (props?.flaggedAutolinking) {
+    mergedConfig = withFlaggedAutolinking(mergedConfig, { flags });
+  }
+
+  return withBuildFlags(config, { ...props, flags });
+};
+
+export default createRunOncePlugin(
+  withBuildFlagsAndLinking,
+  pkg.name,
+  pkg.version
+);

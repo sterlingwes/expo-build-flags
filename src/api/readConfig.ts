@@ -34,3 +34,46 @@ export const readConfig = async (): Promise<FlagsConfig> => {
     process.exit(1);
   }
 };
+
+const getGitBranchName = async () => {
+  try {
+    const head = await readFile(".git/HEAD", { encoding: "utf-8" });
+    const [, , branch] = head.trim().split("/");
+    return branch;
+  } catch (_) {
+    // no-op
+  }
+};
+
+export const readConfigModuleExclusions = async (
+  flagOverrides?: string[]
+): Promise<string[]> => {
+  const { flags } = await readConfig();
+  const branch = await getGitBranchName();
+  return Object.keys(flags)
+    .filter((flag) => !flags[flag].value)
+    .reduce((acc, flag) => {
+      if (flags[flag].modules && !flagOverrides?.includes(flag)) {
+        return [
+          ...acc,
+          ...flags[flag].modules
+            .map((mod) => {
+              if (typeof mod === "string") {
+                return mod;
+              }
+              const [[modName, modConfig]] = Object.entries(mod);
+              if (
+                typeof modConfig === "object" &&
+                "branch" in modConfig &&
+                // @ts-expect-error ts inference issue
+                modConfig.branch !== branch
+              ) {
+                return modName;
+              }
+            })
+            .filter((mod): mod is string => typeof mod === "string"),
+        ];
+      }
+      return acc;
+    }, [] as string[]);
+};
