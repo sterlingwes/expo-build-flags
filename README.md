@@ -85,6 +85,7 @@ Locally-referenced modules aren't currently supported (until [this 'exclude' exc
 - [ ] allow for referencing flag values from native code on iOS or Android
 - [x] allow for tree-shaking of the JS bundle and dead code path elimination
 - [x] allow for typescript to see the specific flags available
+- [ ] handle autolinking exclusions for react-native modules
 - [ ] add metro resolver w/ proxy to surface better flagged autolinking error messages
 - [ ] add android integration spec for flagged autolinking
 - [ ] doc site & readme cleanup to reference

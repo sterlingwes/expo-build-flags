@@ -1,6 +1,15 @@
 const fs = require("fs");
 const cp = require("child_process");
 
+const fallbackBabelConfig = `
+module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
+  }
+}
+`;
+
 installBabelPlugin();
 generateBuildFlagsModule();
 addBuildFlag();
@@ -11,7 +20,13 @@ bundleApp();
 assertBuildFlagShakenFromBundle();
 
 function installBabelPlugin() {
-  const babelConfig = fs.readFileSync("babel.config.js", "utf8");
+  let babelConfig;
+  try {
+    babelConfig = fs.readFileSync("babel.config.js", "utf8");
+  } catch (_) {}
+  if (!babelConfig) {
+    babelConfig = fallbackBabelConfig;
+  }
   const searchStr = "return {";
   const replaceStr =
     'return {\n  plugins: [\n    ["expo-build-flags/babel-plugin", {\n      "flagsModule": "./constants/buildFlags.ts"\n    }]\n  ],\n';

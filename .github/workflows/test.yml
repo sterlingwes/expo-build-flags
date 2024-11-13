@@ -8,6 +8,28 @@ on:
       - main
 
 jobs:
+  test-sdk-51:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_SDK_TARGET: 51
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run integration for SDK 51
+        run: ./test/run-integration.sh
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -27,22 +49,3 @@ jobs:
 
       - name: Run jest suites
         run: ./node_modules/.bin/jest
-
-      - name: Setup test project
-        run: ./test/setup.sh
-
-      - name: Run spec for flag overrides
-        working-directory: example
-        run: ../test/test-overrides.sh
-
-      - name: Run spec for babel plugin tree shaking
-        working-directory: example
-        run: node ../test/test-babel-plugin.js
-
-      - name: Run spec for expo config plugin
-        working-directory: example
-        run: node ../test/test-config-plugin.js
-
-      - name: Run spec for flagged autolinking
-        working-directory: example
-        run: node ../test/test-autolinking.js

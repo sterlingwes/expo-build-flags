@@ -37,7 +37,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "npm run test:unit && ./test/setup.sh && cd example && ../test/test-overrides.sh && node ../test/test-babel-plugin.js && node ../test/test-config-plugin.js && node ../test/test-autolinking.js",
+    "test": "npm run test:unit && EXPO_SDK_TARGET=51 ./test/run-integration.sh",
     "test:unit": "./node_modules/.bin/jest"
   }
 }
