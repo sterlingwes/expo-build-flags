@@ -18,7 +18,8 @@ const withFlaggedAutolinkingForApple: ConfigPlugin<Props> = (
       );
       let contents = await fs.promises.readFile(podfile, "utf8");
       const exclude = await getExclusions(flags);
-      contents = updatePodfileAutolinkCall(contents, { exclude });
+      contents = updatePodfileReactNativeAutolinkCall(contents, { exclude });
+      contents = updatePodfileExpoModulesAutolinkCall(contents, { exclude });
       await fs.promises.writeFile(podfile, contents, "utf8");
       return config;
     },
@@ -55,7 +56,25 @@ export const withFlaggedAutolinking: ConfigPlugin<{ flags: string[] }> = (
   );
 };
 
-export function updatePodfileAutolinkCall(
+export function updatePodfileReactNativeAutolinkCall(
+  contents: string,
+  { exclude }: { exclude: string[] }
+): string {
+  const matchPoint = "origin_autolinking_method.call(config_command)";
+  return contents.replace(
+    matchPoint,
+    `
+    # expo-build-flags autolinking override
+    config_command = [
+      './node_modules/.bin/build-flags-autolinking',
+      ${exclude.map((dep) => [`'-x'`, `'${dep}'`].join(", ")).join(", ")}
+    ]
+    ${matchPoint}
+`
+  );
+}
+
+export function updatePodfileExpoModulesAutolinkCall(
   contents: string,
   { exclude }: { exclude: string[] }
 ): string {
