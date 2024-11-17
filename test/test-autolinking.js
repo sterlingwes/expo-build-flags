@@ -30,7 +30,8 @@ function addModulesForExclusion() {
   const flagWithModules = `  secretFeature:
     modules:
       - expo-splash-screen
-      - expo-status-bar`;
+      - expo-status-bar
+      - react-native-reanimated`;
   defaultFlags = defaultFlags.replace("  secretFeature:", flagWithModules);
   console.log("patched flags.yml:\n\n", defaultFlags);
   fs.writeFileSync("flags.yml", defaultFlags);
@@ -63,6 +64,15 @@ async function runPrebuild() {
 
 function assertPodfileLockExcludesModules() {
   const podfileLock = fs.readFileSync("ios/Podfile.lock", "utf-8");
+
+  // assertion for core linking exclusion
+  if (podfileLock.includes("Reanimated")) {
+    throw new Error(
+      "Expected ios/Podfile.lock to exclude react-native-reanimated"
+    );
+  }
+
+  // assertion for expo linking exclusion
   if (podfileLock.includes("Splash")) {
     throw new Error("Expected ios/Podfile.lock to exclude expo-splash-screen");
   }
