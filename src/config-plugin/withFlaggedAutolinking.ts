@@ -66,7 +66,7 @@ export function updatePodfileReactNativeAutolinkCall(
     `
     # expo-build-flags autolinking override
     config_command = [
-      './node_modules/.bin/build-flags-autolinking',
+      '../node_modules/.bin/build-flags-autolinking',
       ${exclude.map((dep) => [`'-x'`, `'${dep}'`].join(", ")).join(", ")}
     ]
     ${matchPoint}

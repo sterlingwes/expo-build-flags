@@ -59,6 +59,10 @@ async function runPrebuild() {
 
   cp.execSync("../node_modules/.bin/pod-lockfile --debug --project ios", {
     stdio: "inherit",
+    env: {
+      ...process.env,
+      EXPO_UNSTABLE_CORE_AUTOLINKING: "1",
+    },
   });
 }
 

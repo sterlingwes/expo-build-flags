@@ -84,7 +84,7 @@ describe("withFlaggedAutolinking", () => {
         .join("\n");
       expect(matchLines).toMatchInlineSnapshot(`
 "    config_command = [
-      './node_modules/.bin/build-flags-autolinking',
+      '../node_modules/.bin/build-flags-autolinking',
       '-x', 'react-native-device-info', '-x', 'react-native-reanimated'
     ]
     origin_autolinking_method.call(config_command)"
