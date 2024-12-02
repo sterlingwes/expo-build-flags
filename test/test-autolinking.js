@@ -99,6 +99,13 @@ function assertGradleProjectExcludesModules() {
       (error, stdout, stderr) => {
         console.log(stdout);
 
+        if (!stdout.includes("+--- Project ':app'")) {
+          reject(
+            new Error("Expected android project to include base project ':app'")
+          );
+          return;
+        }
+
         if (stdout.includes("+--- Project ':react-native-reanimated'")) {
           reject(
             new Error(
@@ -107,6 +114,8 @@ function assertGradleProjectExcludesModules() {
           );
           return;
         }
+
+        console.log("Test passed!");
         resolve();
       }
     );
