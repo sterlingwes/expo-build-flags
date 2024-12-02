@@ -41,6 +41,24 @@ type ConfigOutput = {
   dependencies: Record<string, { name: string; root: string; platforms: any }>;
 };
 
+const getPlatform = () => {
+  const platformIndex = commandArgs.indexOf("-p");
+  if (platformIndex === -1) {
+    throw new Error(
+      "expo-build-flags autolinking CLI: No platform (-p) argument provided"
+    );
+  }
+
+  const platform = commandArgs[platformIndex + 1];
+  if (platform !== "ios" && platform !== "android") {
+    throw new Error(
+      `expo-build-flags autolinking CLI: Invalid platform provided "${platform}"`
+    );
+  }
+
+  return platform;
+};
+
 const getExclusions = () => {
   return commandArgs.reduce((acc, arg, idx) => {
     const next = commandArgs[idx + 1];
@@ -65,9 +83,12 @@ const processConfig = (config: ConfigOutput) => {
   return JSON.stringify(updatedConfig);
 };
 
-expoAutolinking(["react-native-config", "--json", "--platform", "ios"]).then(
-  () => {
-    console.log = logMethod;
-    console.log(processConfig(findConfigFromArgs(logCallArgs)));
-  }
-);
+expoAutolinking([
+  "react-native-config",
+  "--json",
+  "--platform",
+  getPlatform(),
+]).then(() => {
+  console.log = logMethod;
+  console.log(processConfig(findConfigFromArgs(logCallArgs)));
+});

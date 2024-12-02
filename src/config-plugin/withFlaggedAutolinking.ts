@@ -18,6 +18,9 @@ const withFlaggedAutolinkingForApple: ConfigPlugin<Props> = (
       );
       let contents = await fs.promises.readFile(podfile, "utf8");
       const exclude = await getExclusions(flags);
+      if (!exclude.length) {
+        return config;
+      }
       contents = updatePodfileReactNativeAutolinkCall(contents, { exclude });
       contents = updatePodfileExpoModulesAutolinkCall(contents, { exclude });
       await fs.promises.writeFile(podfile, contents, "utf8");
@@ -39,7 +42,11 @@ const withFlaggedAutolinkingForAndroid: ConfigPlugin<Props> = (
       );
       let contents = await fs.promises.readFile(gradleSettings, "utf8");
       const exclude = await getExclusions(flags);
-      contents = updateGradleAutolinkCall(contents, { exclude });
+      if (!exclude.length) {
+        return config;
+      }
+      contents = updateGradleReactNativeAutolinkCall(contents, { exclude });
+      contents = updateGradleExpoModulesAutolinkCall(contents, { exclude });
       await fs.promises.writeFile(gradleSettings, contents, "utf8");
       return config;
     },
@@ -67,6 +74,7 @@ export function updatePodfileReactNativeAutolinkCall(
     # expo-build-flags autolinking override
     config_command = [
       '../node_modules/.bin/build-flags-autolinking',
+      '-p', 'ios',
       ${exclude.map((dep) => [`'-x'`, `'${dep}'`].join(", ")).join(", ")}
     ]
     ${matchPoint}
@@ -95,7 +103,26 @@ export function updatePodfileExpoModulesAutolinkCall(
   );
 }
 
-export function updateGradleAutolinkCall(
+export function updateGradleReactNativeAutolinkCall(
+  contents: string,
+  { exclude }: { exclude: string[] }
+): string {
+  const matchPoint = "ex.autolinkLibrariesFromCommand(command)";
+
+  return contents.replace(
+    matchPoint,
+    `// expo-build-flags autolinking override
+    command = [
+      './node_modules/.bin/build-flags-autolinking',
+      '-p', 'android',
+      ${exclude.map((dep) => [`'-x'`, `'${dep}'`].join(", ")).join(", ")}
+    ].toList()
+    ${matchPoint}
+    `
+  );
+}
+
+export function updateGradleExpoModulesAutolinkCall(
   contents: string,
   { exclude }: { exclude: string[] }
 ): string {

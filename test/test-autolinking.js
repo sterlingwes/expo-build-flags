@@ -40,6 +40,7 @@ function addModulesForExclusion() {
 async function runAsync() {
   await runPrebuild();
   await assertPodfileLockExcludesModules();
+  await assertGradleProjectExcludesModules();
   process.exit(0);
 }
 
@@ -82,4 +83,32 @@ function assertPodfileLockExcludesModules() {
   }
 
   console.log("Test passed!");
+}
+
+function assertGradleProjectExcludesModules() {
+  return new Promise((resolve, reject) => {
+    cp.exec(
+      "cd android && ./gradlew projects --console=plain",
+      {
+        stdio: "inherit",
+        env: {
+          ...process.env,
+          EXPO_UNSTABLE_CORE_AUTOLINKING: "1",
+        },
+      },
+      (error, stdout, stderr) => {
+        console.log(stdout);
+
+        if (stdout.includes("+--- Project ':react-native-reanimated'")) {
+          reject(
+            new Error(
+              "Expected android project to exclude react-native-reanimated"
+            )
+          );
+          return;
+        }
+        resolve();
+      }
+    );
+  });
 }
