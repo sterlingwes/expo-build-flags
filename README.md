@@ -51,7 +51,7 @@ To benefit from tree shaking, add the babel plugin to your project's babel confi
 
 The `flagsModule` path must match the runtime `mergePath` in your committed flags.yml file. This plugin replaces the `BuildFlags` imports with the literal boolean values which allows the build pipeline to strip unreachable paths.
 
-### Flagged Autolinking
+### Flagged Autolinking (for RN >=75)
 
 If your feature relies on native module behaviour, you may want to avoid linking that module if the build flag is off. To do so, specify the absolute name or relative path to the module in the base definition for your flag:
 
@@ -72,6 +72,8 @@ modules:
   - react-native-device-info:
       branch: some-branch-with-build
 ```
+
+In order to enable this you need to pass `flaggedAutolinking: true` as an option to the expo config plugin.
 
 Locally-referenced modules aren't currently supported (until [this 'exclude' exclusion](https://github.com/expo/expo/blob/24d5ae5f288013df19ac09a3406c6a507d781ddb/packages/expo-modules-autolinking/src/autolinking/findModules.ts#L52) can be overridden).
 
