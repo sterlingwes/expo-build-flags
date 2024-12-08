@@ -3,7 +3,7 @@ import { jest, describe, it, expect, beforeEach } from "@jest/globals";
 import {
   updateGradleReactNativeAutolinkCall,
   updateGradleExpoModulesAutolinkCall,
-  updatePodfileReactNativeAutolinkCall,
+  updatePodfileReactNativeAutolinkCallForSDK51,
   updatePodfileExpoModulesAutolinkCall,
 } from "./withFlaggedAutolinking";
 
@@ -96,14 +96,14 @@ describe("withFlaggedAutolinking", () => {
     });
   });
 
-  describe("updatePodfileReactNativeAutolinkCall", () => {
+  describe("updatePodfileReactNativeAutolinkCallForSDK51", () => {
     const podfileContents = fs.readFileSync(
       "src/config-plugin/fixtures/Podfile",
       "utf8"
     );
 
     it("should replace origin_autolinking_method.call(config_command) with custom autolinking command", () => {
-      const updatedContents = updatePodfileReactNativeAutolinkCall(
+      const updatedContents = updatePodfileReactNativeAutolinkCallForSDK51(
         podfileContents,
         {
           exclude: ["react-native-device-info", "react-native-reanimated"],
