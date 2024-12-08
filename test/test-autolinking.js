@@ -30,7 +30,8 @@ function addModulesForExclusion() {
   const flagWithModules = `  secretFeature:
     modules:
       - expo-splash-screen
-      - expo-status-bar`;
+      - expo-status-bar
+      - react-native-reanimated`;
   defaultFlags = defaultFlags.replace("  secretFeature:", flagWithModules);
   console.log("patched flags.yml:\n\n", defaultFlags);
   fs.writeFileSync("flags.yml", defaultFlags);
@@ -38,7 +39,9 @@ function addModulesForExclusion() {
 
 async function runAsync() {
   await runPrebuild();
+  await logEnv();
   await assertPodfileLockExcludesModules();
+  await assertGradleProjectExcludesModules();
   process.exit(0);
 }
 
@@ -58,14 +61,77 @@ async function runPrebuild() {
 
   cp.execSync("../node_modules/.bin/pod-lockfile --debug --project ios", {
     stdio: "inherit",
+    env: {
+      ...process.env,
+      EXPO_UNSTABLE_CORE_AUTOLINKING: "1",
+    },
   });
 }
 
 function assertPodfileLockExcludesModules() {
   const podfileLock = fs.readFileSync("ios/Podfile.lock", "utf-8");
+
+  // assertion for core linking exclusion
+  if (podfileLock.includes("Reanimated")) {
+    throw new Error(
+      "Expected ios/Podfile.lock to exclude react-native-reanimated"
+    );
+  }
+
+  // assertion for expo linking exclusion
   if (podfileLock.includes("Splash")) {
     throw new Error("Expected ios/Podfile.lock to exclude expo-splash-screen");
   }
 
-  console.log("Test passed!");
+  console.log("assertPodfileLockExcludesModules passed!");
+}
+
+function assertGradleProjectExcludesModules() {
+  return new Promise((resolve, reject) => {
+    cp.exec(
+      "cd android && ./gradlew projects --console=plain",
+      {
+        stdio: "inherit",
+        env: {
+          ...process.env,
+          EXPO_UNSTABLE_CORE_AUTOLINKING: "1",
+        },
+      },
+      (error, stdout, stderr) => {
+        console.log(stdout);
+
+        if (!stdout.includes("+--- Project ':app'")) {
+          reject(
+            new Error("Expected android project to include base project ':app'")
+          );
+          return;
+        }
+
+        if (stdout.includes("+--- Project ':react-native-reanimated'")) {
+          reject(
+            new Error(
+              "Expected android project to exclude react-native-reanimated"
+            )
+          );
+          return;
+        }
+
+        console.log("assertGradleProjectExcludesModules passed!");
+        resolve();
+      }
+    );
+  });
+}
+
+function logEnv() {
+  return new Promise((resolve) => {
+    cp.exec(
+      "cd android && ./gradlew -v",
+      { stdio: "inherit" },
+      (error, stdout, stderr) => {
+        console.log(stdout);
+        resolve();
+      }
+    );
+  });
 }

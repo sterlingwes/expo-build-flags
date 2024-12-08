@@ -5,7 +5,8 @@
   "author": "Wes Johnson <wes@swj.io>",
   "license": "MIT",
   "bin": {
-    "build-flags": "bin/build-flags.sh"
+    "build-flags": "bin/build-flags.sh",
+    "build-flags-autolinking": "bin/build-flags-autolinking.sh"
   },
   "main": "build/api/index.js",
   "files": [
@@ -38,6 +39,7 @@
   "scripts": {
     "build": "tsc",
     "test": "npm run test:unit && EXPO_SDK_TARGET=51 ./test/run-integration.sh",
+    "test:next": "EXPO_SDK_TARGET=52 ./test/run-integration.sh",
     "test:unit": "./node_modules/.bin/jest"
   }
 }

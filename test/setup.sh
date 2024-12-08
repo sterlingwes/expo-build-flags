@@ -16,6 +16,12 @@ CI=1 npx create-expo-app --template "expo-template-default@$EXPO_SDK_TARGET" exa
 
 echo "Installing library"
 cd example
+
+if [ "$EXPO_SDK_TARGET" -eq "51" ]; then
+  echo "Using expo SDK 51 with react-native 0.75.0"
+  npm install --save react-native@~0.75.0
+fi
+
 npm install --install-links --save-dev ../
 
 echo "copy over flag fixture"

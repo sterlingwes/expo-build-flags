@@ -3,11 +3,25 @@ import path from "path";
 import { ConfigPlugin, withDangerousMod } from "@expo/config-plugins";
 import { readConfigModuleExclusions } from "../api/readConfig";
 
-type Props = { flags: string[] };
+type Props = { flags: string[]; expoMajorVersion: number };
+
+type Updater = (contents: string, { exclude }: { exclude: string[] }) => string;
+
+const appleRNLinkingLookup: Record<number | "default", Updater> = {
+  51: updatePodfileReactNativeAutolinkCallForSDK51,
+  52: updatePodfileReactNativeAutolinkCallForSDK52,
+  default: updatePodfileReactNativeAutolinkCallForSDK52,
+};
+
+const appleExpoLinkingLookup: Record<number | "default", Updater> = {
+  51: updatePodfileExpoModulesAutolinkCall,
+  52: updatePodfileExpoModulesAutolinkCall,
+  default: updatePodfileExpoModulesAutolinkCall,
+};
 
 const withFlaggedAutolinkingForApple: ConfigPlugin<Props> = (
   config,
-  { flags }
+  { flags, expoMajorVersion }
 ) => {
   return withDangerousMod(config, [
     "ios",
@@ -18,7 +32,18 @@ const withFlaggedAutolinkingForApple: ConfigPlugin<Props> = (
       );
       let contents = await fs.promises.readFile(podfile, "utf8");
       const exclude = await getExclusions(flags);
-      contents = updatePodfileAutolinkCall(contents, { exclude });
+      if (!exclude.length) {
+        return config;
+      }
+
+      const setupRNModuleLinking =
+        appleRNLinkingLookup[expoMajorVersion] || appleRNLinkingLookup.default;
+      const setupExpoModuleLinking =
+        appleExpoLinkingLookup[expoMajorVersion] ||
+        appleExpoLinkingLookup.default;
+
+      contents = setupRNModuleLinking(contents, { exclude });
+      contents = setupExpoModuleLinking(contents, { exclude });
       await fs.promises.writeFile(podfile, contents, "utf8");
       return config;
     },
@@ -38,7 +63,11 @@ const withFlaggedAutolinkingForAndroid: ConfigPlugin<Props> = (
       );
       let contents = await fs.promises.readFile(gradleSettings, "utf8");
       const exclude = await getExclusions(flags);
-      contents = updateGradleAutolinkCall(contents, { exclude });
+      if (!exclude.length) {
+        return config;
+      }
+      contents = updateGradleReactNativeAutolinkCall(contents, { exclude });
+      contents = updateGradleExpoModulesAutolinkCall(contents, { exclude });
       await fs.promises.writeFile(gradleSettings, contents, "utf8");
       return config;
     },
@@ -49,13 +78,60 @@ export const withFlaggedAutolinking: ConfigPlugin<{ flags: string[] }> = (
   config,
   props
 ) => {
+  const expoPkg = require("expo/package.json");
+  const [expoMajorVersion] = expoPkg.version.split(".");
+  const extendedProps = {
+    ...props,
+    expoMajorVersion: parseInt(expoMajorVersion, 10),
+  };
+
+  console.log("withFlaggedAutolinking", extendedProps);
+
   return withFlaggedAutolinkingForAndroid(
-    withFlaggedAutolinkingForApple(config, props),
-    props
+    withFlaggedAutolinkingForApple(config, extendedProps),
+    extendedProps
   );
 };
 
-export function updatePodfileAutolinkCall(
+export function updatePodfileReactNativeAutolinkCallForSDK51(
+  contents: string,
+  { exclude }: { exclude: string[] }
+): string {
+  const matchPoint = "origin_autolinking_method.call(config_command)";
+  return contents.replace(
+    matchPoint,
+    `
+    # expo-build-flags autolinking override
+    config_command = [
+      '../node_modules/.bin/build-flags-autolinking',
+      '-p', 'ios',
+      ${exclude.map((dep) => [`'-x'`, `'${dep}'`].join(", ")).join(", ")}
+    ]
+    ${matchPoint}
+`
+  );
+}
+
+export function updatePodfileReactNativeAutolinkCallForSDK52(
+  contents: string,
+  { exclude }: { exclude: string[] }
+): string {
+  const matchPoint = "config = use_native_modules!(config_command)";
+  return contents.replace(
+    matchPoint,
+    `
+    # expo-build-flags autolinking override
+    config_command = [
+      '../node_modules/.bin/build-flags-autolinking',
+      '-p', 'ios',
+      ${exclude.map((dep) => [`'-x'`, `'${dep}'`].join(", ")).join(", ")}
+    ]
+    ${matchPoint}
+`
+  );
+}
+
+export function updatePodfileExpoModulesAutolinkCall(
   contents: string,
   { exclude }: { exclude: string[] }
 ): string {
@@ -76,7 +152,26 @@ export function updatePodfileAutolinkCall(
   );
 }
 
-export function updateGradleAutolinkCall(
+export function updateGradleReactNativeAutolinkCall(
+  contents: string,
+  { exclude }: { exclude: string[] }
+): string {
+  const matchPoint = "ex.autolinkLibrariesFromCommand(command)";
+
+  return contents.replace(
+    matchPoint,
+    `// expo-build-flags autolinking override
+    command = [
+      './node_modules/.bin/build-flags-autolinking',
+      '-p', 'android',
+      ${exclude.map((dep) => [`'-x'`, `'${dep}'`].join(", ")).join(", ")}
+    ].toList()
+    ${matchPoint}
+    `
+  );
+}
+
+export function updateGradleExpoModulesAutolinkCall(
   contents: string,
   { exclude }: { exclude: string[] }
 ): string {
