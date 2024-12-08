@@ -83,7 +83,7 @@ function assertPodfileLockExcludesModules() {
     throw new Error("Expected ios/Podfile.lock to exclude expo-splash-screen");
   }
 
-  console.log("Test passed!");
+  console.log("assertPodfileLockExcludesModules passed!");
 }
 
 function assertGradleProjectExcludesModules() {
@@ -116,7 +116,7 @@ function assertGradleProjectExcludesModules() {
           return;
         }
 
-        console.log("Test passed!");
+        console.log("assertGradleProjectExcludesModules passed!");
         resolve();
       }
     );
