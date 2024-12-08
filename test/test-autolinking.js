@@ -39,6 +39,7 @@ function addModulesForExclusion() {
 
 async function runAsync() {
   await runPrebuild();
+  await logEnv();
   await assertPodfileLockExcludesModules();
   await assertGradleProjectExcludesModules();
   process.exit(0);
@@ -116,6 +117,19 @@ function assertGradleProjectExcludesModules() {
         }
 
         console.log("Test passed!");
+        resolve();
+      }
+    );
+  });
+}
+
+function logEnv() {
+  return new Promise((resolve) => {
+    cp.exec(
+      "cd android && ./gradlew -v",
+      { stdio: "inherit" },
+      (error, stdout, stderr) => {
+        console.log(stdout);
         resolve();
       }
     );
