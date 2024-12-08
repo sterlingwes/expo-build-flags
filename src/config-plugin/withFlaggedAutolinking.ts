@@ -3,11 +3,25 @@ import path from "path";
 import { ConfigPlugin, withDangerousMod } from "@expo/config-plugins";
 import { readConfigModuleExclusions } from "../api/readConfig";
 
-type Props = { flags: string[] };
+type Props = { flags: string[]; expoMajorVersion: number };
+
+type Updater = (contents: string, { exclude }: { exclude: string[] }) => string;
+
+const appleRNLinkingLookup: Record<number | "default", Updater> = {
+  51: updatePodfileReactNativeAutolinkCallForSDK51,
+  52: updatePodfileReactNativeAutolinkCallForSDK52,
+  default: updatePodfileReactNativeAutolinkCallForSDK52,
+};
+
+const appleExpoLinkingLookup: Record<number | "default", Updater> = {
+  51: updatePodfileExpoModulesAutolinkCall,
+  52: updatePodfileExpoModulesAutolinkCall,
+  default: updatePodfileExpoModulesAutolinkCall,
+};
 
 const withFlaggedAutolinkingForApple: ConfigPlugin<Props> = (
   config,
-  { flags }
+  { flags, expoMajorVersion }
 ) => {
   return withDangerousMod(config, [
     "ios",
@@ -21,8 +35,15 @@ const withFlaggedAutolinkingForApple: ConfigPlugin<Props> = (
       if (!exclude.length) {
         return config;
       }
-      contents = updatePodfileReactNativeAutolinkCall(contents, { exclude });
-      contents = updatePodfileExpoModulesAutolinkCall(contents, { exclude });
+
+      const setupRNModuleLinking =
+        appleRNLinkingLookup[expoMajorVersion] || appleRNLinkingLookup.default;
+      const setupExpoModuleLinking =
+        appleExpoLinkingLookup[expoMajorVersion] ||
+        appleExpoLinkingLookup.default;
+
+      contents = setupRNModuleLinking(contents, { exclude });
+      contents = setupExpoModuleLinking(contents, { exclude });
       await fs.promises.writeFile(podfile, contents, "utf8");
       return config;
     },
@@ -57,17 +78,45 @@ export const withFlaggedAutolinking: ConfigPlugin<{ flags: string[] }> = (
   config,
   props
 ) => {
+  const expoPkg = require("expo/package.json");
+  const [expoMajorVersion] = expoPkg.version.split(".");
+  const extendedProps = {
+    ...props,
+    expoMajorVersion: parseInt(expoMajorVersion, 10),
+  };
+
+  console.log("withFlaggedAutolinking", extendedProps);
+
   return withFlaggedAutolinkingForAndroid(
-    withFlaggedAutolinkingForApple(config, props),
-    props
+    withFlaggedAutolinkingForApple(config, extendedProps),
+    extendedProps
   );
 };
 
-export function updatePodfileReactNativeAutolinkCall(
+export function updatePodfileReactNativeAutolinkCallForSDK51(
   contents: string,
   { exclude }: { exclude: string[] }
 ): string {
   const matchPoint = "origin_autolinking_method.call(config_command)";
+  return contents.replace(
+    matchPoint,
+    `
+    # expo-build-flags autolinking override
+    config_command = [
+      '../node_modules/.bin/build-flags-autolinking',
+      '-p', 'ios',
+      ${exclude.map((dep) => [`'-x'`, `'${dep}'`].join(", ")).join(", ")}
+    ]
+    ${matchPoint}
+`
+  );
+}
+
+export function updatePodfileReactNativeAutolinkCallForSDK52(
+  contents: string,
+  { exclude }: { exclude: string[] }
+): string {
+  const matchPoint = "config = use_native_modules!(config_command)";
   return contents.replace(
     matchPoint,
     `
