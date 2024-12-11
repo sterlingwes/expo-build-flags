@@ -3,6 +3,15 @@ import type * as BabelT from "babel__core";
 import { parseTsConstantsModule } from "../api/tsParser";
 
 export default declare((babel, options, cwd) => {
+  if (process.env.NODE_ENV === "test") {
+    return {
+      visitor: {
+        VariableDeclarator: () => {},
+        MemberExpression: () => {},
+      },
+    };
+  }
+
   const t = babel.types;
 
   if (typeof options.flagsModule !== "string") {

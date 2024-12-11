@@ -18,6 +18,7 @@ assertBuildFlagInBundle();
 disableFeatureFlag();
 bundleApp();
 assertBuildFlagShakenFromBundle();
+bundleAppAsJestAndAssertNoFolding();
 
 function installBabelPlugin() {
   let babelConfig;
@@ -52,9 +53,33 @@ function addBuildFlag() {
 }
 
 function bundleApp() {
-  cp.execSync("CI=1 npx expo export --no-bytecode --no-minify --clear", {
+  cp.execSync("yarn expo export --no-bytecode --no-minify --clear", {
     stdio: "inherit",
+    env: {
+      ...process.env,
+      CI: "1",
+    },
   });
+}
+
+function bundleAppAsJestAndAssertNoFolding() {
+  const result = cp.execSync(
+    "../node_modules/.bin/babel app/\\(tabs\\)/index.tsx --plugins=expo-build-flags/babel-plugin",
+    {
+      env: {
+        ...process.env,
+        NODE_ENV: "test",
+      },
+    }
+  );
+
+  if (result.toString().includes("New feature enabled!") === false) {
+    throw new Error(
+      "Assertion failed: Build flag not found in jest build result"
+    );
+  }
+
+  console.log("Assertion passed: Build flag found in jest bundle");
 }
 
 function assertBuildFlagInBundle() {
